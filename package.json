@@ -5,6 +5,9 @@
   "repository": "git@github.com:keithalpichi/package-installer-coding-exercise.git",
   "author": "Keith Alpichi <keithalpichi@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "test": "ava"
+  },
   "devDependencies": {
     "ava": "^0.19.1"
   },
