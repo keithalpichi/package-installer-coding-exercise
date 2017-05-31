@@ -9,12 +9,21 @@
     "test": "ava"
   },
   "devDependencies": {
-    "ava": "^0.19.1"
+    "ava": "^0.19.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.24.1"
   },
   "ava": {
     "files": [
-      "index.js"
+      "test.js"
     ],
-    "failFast": true
+    "failFast": true,
+    "babel": "inherit",
+    "require": ["babel-register"]
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
   }
 }
