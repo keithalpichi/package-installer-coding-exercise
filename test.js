@@ -1,6 +1,21 @@
 import test from 'ava'
 import packageInstaller from './index'
 
+const verifyDependencyOrder = (deps, result) => {
+  result = result.split(', ')
+  let memo = {}
+  for (var i = 0; i < deps.length; i++) {
+    let packages = deps[i].slice(': ')
+    let p = packages[0]
+    let dep = packages[1]
+    if (!memo[p]) { memo[p] = result.indexOf(p) }
+    if (dep && dep.length === 0) { continue }
+    if (!memo[dep]) { memo[dep] = result.indexOf(dep) }
+    if (memo[dep] > memo[p]) { return false }
+  }
+  return true
+}
+
 test('no input returns null output', t => {
   t.is(packageInstaller(), null)
 })
@@ -11,18 +26,32 @@ test('empty array as input returns empty array as output', t => {
 
 test('should throw TypeError if input is not array', t => {
   const error = t.throws(() => {
-    packageInstaller('this throw an error')
+    packageInstaller('this will throw an error')
   }, TypeError)
 
-  t.is(error.message, 'Input should be an array but instead got "this throw an error"')
+  t.is(error.message, 'Input should be an array but instead got "string"')
 })
 
-test.skip('single package with no dependencies should return the single package as a string', t => {
+test('should throw a TypeError if any items in input are not strings', t => {
+  const error = t.throws(() => {
+    packageInstaller(['valid: ', 'valid: ', 0, 'valid: '])
+  }, TypeError)
+
+  t.is(error.message, 'Invalid item type in input at index 2. All items should be strings')
+})
+
+test('single package with no dependencies should return the single package as a string', t => {
   t.is(packageInstaller(['CamelCaser: ']), 'CamelCaser')
 })
 
-test.skip('should return a valid dependency path for two packages as a string', t => {
+test('should return a valid dependency path for two packages as a string', t => {
   t.is(packageInstaller(['KittenService: CamelCaser', 'CamelCaser: ']), 'CamelCaser, KittenService')
+})
+
+test('should return a valid dependency path for multiple packages as a string', t => {
+  const value = packageInstaller(['KittenService: ', 'Leetmeme: Cyberportal', 'Cyberportal: Ice', 'CamelCaser: KittenService', 'Fraudstream: Leetmeme', 'Ice: '])
+  const expected = 'KittenService, Ice, Cyberportal, Leetmeme, CamelCaser, Fraudstream'
+  t.true(verifyDependencyOrder(value, expected))
 })
 
 test.skip('should throw an error if dependencies contain cycles', t => {
