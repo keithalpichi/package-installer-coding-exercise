@@ -54,7 +54,7 @@ test('should return a valid dependency path for multiple packages as a string', 
   t.true(verifyDependencyOrder(value, expected))
 })
 
-test.skip('should throw an error if dependencies contain cycles', t => {
+test('should throw an error if dependencies contain cycles', t => {
   const error = t.throws(() => {
     packageInstaller(['KittenService: ', 'Leetmeme: Cyberportal', 'Cyberportal: Ice', 'CamelCaser: KittenService', 'Fraudstream: ', 'Ice: Leetmeme'])
   }, Error)

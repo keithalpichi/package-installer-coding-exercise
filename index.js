@@ -9,20 +9,20 @@ const packageInstaller = deps => {
   const sortPackages = nodes => {
     const traverse = (pkg, predecessors) => {
       if (visited[pkg]) { return }
-      predecessors.push(pkg)
       visited[pkg] = true
-
-      if (nodes[pkg]) {
-        if (predecessors.indexOf(nodes[pkg]) >= 0) {
+      let dependency = nodes[pkg]
+      if (dependency) {
+        if (predecessors[dependency]) {
           throw new Error('Invalid input due to cycles in the dependency path')
         }
-        traverse(nodes[pkg], predecessors)
+        predecessors[pkg] = true
+        traverse(dependency, predecessors)
       }
 
       result.push(pkg)
     }
     Object.keys(nodes).forEach(node => {
-      traverse(node, [])
+      traverse(node, {})
     })
   }
 
@@ -38,11 +38,8 @@ const buildGraph = deps => {
     let pair = packages.split(': ')
     let pkg = pair[0]
     let dep = pair.length > 0 && pair[1]
-    if (!nodes[pkg]) { nodes[pkg] = null }
-    if (dep && dep.length > 0 && !nodes[dep]) {
-      nodes[pkg] = dep
-      nodes[dep] = null
-    }
+    if (!nodes[pkg] && !dep) { nodes[pkg] = null }
+    if (!nodes[pkg] && dep && dep.length > 0) { nodes[pkg] = dep }
   })
   return nodes
 }
