@@ -36,12 +36,12 @@ const buildGraph = deps => {
   const nodes = {}
   const arrayNodes = []
   deps.forEach((packages, i) => {
-    if (typeof packages !== 'string') { throw new TypeError(`Invalid item type in input at index ${i}. All items should be strings`) }
+    if (typeof packages !== 'string' || packages.search(/: /) === -1) { throw new TypeError(`Invalid item type in input at index ${i}.`) }
     const pair = packages.split(': ')
     const pkg = pair[0]
-    const dep = pair.length > 0 && pair[1]
-    if (!nodes[pkg] && !dep) { nodes[pkg] = null }
-    if (!nodes[pkg] && dep) { nodes[pkg] = dep }
+    const dep = pair[1]
+    if (!nodes[pkg] && dep.length === 0) { nodes[pkg] = null }
+    if (!nodes[pkg] && dep.length > 0) { nodes[pkg] = dep }
     arrayNodes.push(pkg)
   })
   return { nodes, arrayNodes }

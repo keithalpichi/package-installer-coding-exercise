@@ -32,12 +32,20 @@ test('should throw TypeError if input is not array', t => {
   t.is(error.message, 'Input should be an array but instead got "string"')
 })
 
-test('should throw a TypeError if any items in input are not strings', t => {
+test('should throw a TypeError if any items in input are not valid strings', t => {
   const error = t.throws(() => {
     packageInstaller(['valid: ', 'valid: ', 0, 'valid: '])
   }, TypeError)
 
-  t.is(error.message, 'Invalid item type in input at index 2. All items should be strings')
+  t.is(error.message, 'Invalid item type in input at index 2.')
+})
+
+test('should throw a TypeError if any items in input are don\'t contain two a colon', t => {
+  const error = t.throws(() => {
+    packageInstaller(['invalid', 'valid: '])
+  }, TypeError)
+
+  t.is(error.message, 'Invalid item type in input at index 0.')
 })
 
 test('single package with no dependencies should return the single package as a string', t => {
